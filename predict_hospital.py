@@ -11,15 +11,17 @@ def haversine_distance(coord1, coord2):
     lat2, lon2 = map(radians, coord2)
     dlat = lat2 - lat1
     dlon = lon2 - lon1
-    a = sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlon/2)**2
-    c = 2 * atan2(sqrt(a), sqrt(1-a))
+    a = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlon / 2) ** 2
+    c = 2 * atan2(sqrt(a), sqrt(1 - a))
     return R * c
 
 # Load model and encoders
 with open('hospital_prediction_model.pkl', 'rb') as f:
     model = pickle.load(f)
+
 with open('le_severity.pkl', 'rb') as f:
     le_severity = pickle.load(f)
+
 with open('le_condition.pkl', 'rb') as f:
     le_condition = pickle.load(f)
 
@@ -38,10 +40,17 @@ VALID_CONDITIONS = [
     'Fracture', 'Moderate respiratory distress', 'Abdominal pain',  # Medium
     'Heart attack', 'Major trauma', 'Stroke'  # High
 ]
-MARIKINA_BBOX = {'lat_min': 14.60, 'lat_max': 14.68, 'lon_min': 121.07, 'lon_max': 121.13}
+
+MARIKINA_BBOX = {
+    'lat_min': 14.60,
+    'lat_max': 14.68,
+    'lon_min': 121.07,
+    'lon_max': 121.13
+}
 
 # Get user input
 print("Enter patient details for hospital prediction:")
+
 while True:
     try:
         latitude = float(input("Latitude (14.60 to 14.68): "))
