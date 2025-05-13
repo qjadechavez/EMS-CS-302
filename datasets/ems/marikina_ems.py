@@ -21,6 +21,6 @@ ems = [{'ems_id': unit['ems_id'], 'type': unit['type'], 'base_latitude': unit['b
 
 # Save to CSV
 ems_df = pd.DataFrame(ems)
-ems_df.to_csv('marikina_ems.csv', index=False)
+ems_df.to_csv('./datasets/ems/marikina_ems.csv', index=False)
 print("EMS Dataset (Marikina Rescue 161):")
 print(ems_df.to_string(index=False))
