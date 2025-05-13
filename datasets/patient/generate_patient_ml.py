@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 from math import radians, sin, cos, sqrt, atan2
 
 def haversine_distance(coord1, coord2):
+    """Calculate the great-circle distance between two points on Earth in km."""
     R = 6371  # Earth's radius in km
     lat1, lon1 = map(radians, coord1)
     lat2, lon2 = map(radians, coord2)
@@ -27,7 +28,7 @@ ems = ems.to_dict('records')
 
 # Parameters
 NUM_PATIENTS = 1000
-MARİKİNA_BBOX = {'lat_min': 14.60, 'lat_max': 14.68, 'lon_min': 121.07, 'lon_max': 121.13}
+MARIKINA_BBOX = {'lat_min': 14.60, 'lat_max': 14.68, 'lon_min': 121.07, 'lon_max': 121.13}
 SEVERITY_WEIGHTS = {'low': 0.5, 'medium': 0.3, 'high': 0.2}
 CONDITIONS = {
     'low': ['Minor injury', 'Fever', 'Laceration'],
@@ -42,11 +43,16 @@ np.random.seed(42)
 patients = []
 current_time = START_TIME
 for i in range(NUM_PATIENTS):
-    lat = np.random.uniform(MARİKİNA_BBOX['lat_min'], MARİKİNA_BBOX['lat_max'])
-    lon = np.random.uniform(MARİKİNA_BBOX['lon_min'], MARİKİNA_BBOX['lon_max'])
+    # Generate random patient location within Marikina
+    lat = np.random.uniform(MARIKINA_BBOX['lat_min'], MARIKINA_BBOX['lat_max'])
+    lon = np.random.uniform(MARIKINA_BBOX['lon_min'], MARIKINA_BBOX['lon_max'])
     patient_location = [lat, lon]
+    
+    # Assign severity and condition
     severity = np.random.choice(['low', 'medium', 'high'], p=[SEVERITY_WEIGHTS['low'], SEVERITY_WEIGHTS['medium'], SEVERITY_WEIGHTS['high']])
     condition = np.random.choice(CONDITIONS[severity])
+    
+    # Simulate call time
     time_offset = timedelta(minutes=np.random.randint(5, 15))
     call_time = current_time + time_offset
     
@@ -61,7 +67,7 @@ for i in range(NUM_PATIENTS):
     ems_unit = available_ems[0] if available_ems else ems[0]
     ems_unit['status'] = 'Dispatched'
     
-    # Calculate response time
+    # Calculate response time to patient
     distance_to_patient = haversine_distance(ems_unit['base_location'], patient_location)
     time_to_patient = (distance_to_patient / AVERAGE_SPEED) * 60
     
@@ -69,7 +75,15 @@ for i in range(NUM_PATIENTS):
     min_level = {'low': 1, 'medium': 3, 'high': 3}[severity]
     available_hospitals = [h for h in hospitals if h['level'] >= min_level]
     if available_hospitals:
-        distances = [(h, haversine_distance(patient_location, h['location'])) for h in available_hospitals]
+        if severity == 'low':
+            # Prefer Level 1 hospitals for low severity (70% chance)
+            level_1_hospitals = [h for h in available_hospitals if h['level'] == 1]
+            if level_1_hospitals and np.random.random() < 0.7:
+                distances = [(h, haversine_distance(patient_location, h['location'])) for h in level_1_hospitals]
+            else:
+                distances = [(h, haversine_distance(patient_location, h['location'])) for h in available_hospitals]
+        else:
+            distances = [(h, haversine_distance(patient_location, h['location'])) for h in available_hospitals]
         hospital, distance_to_hospital = min(distances, key=lambda x: x[1])
         hospital_id = hospital['id']
         time_to_hospital = (distance_to_hospital / AVERAGE_SPEED) * 60
@@ -78,12 +92,14 @@ for i in range(NUM_PATIENTS):
         distance_to_hospital = None
         time_to_hospital = 0
     
+    # Calculate total response time
     response_time = time_to_patient + time_to_hospital
     
     # Update EMS status
     ems_unit['status'] = 'Available'
     ems_unit['last_available_time'] = call_time + timedelta(minutes=response_time)
     
+    # Store patient data
     patients.append({
         'patient_id': i + 1,
         'latitude': lat,
@@ -92,8 +108,8 @@ for i in range(NUM_PATIENTS):
         'condition': condition,
         'Call_Time': call_time.strftime('%Y-%m-%d %H:%M:%S'),
         'hospital_id': hospital_id,
-        'distance_to_hospital_km': distance_to_hospital,  # Updated column name
-        'response_time_min': response_time  # Updated column name
+        'distance_to_hospital_km': distance_to_hospital,
+        'response_time_min': response_time
     })
     
     current_time = call_time
