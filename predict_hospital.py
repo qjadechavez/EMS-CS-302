@@ -2,8 +2,10 @@ import pandas as pd
 import pickle
 import numpy as np
 from math import radians, sin, cos, sqrt, atan2
+import requests
+import time
 
-# Haversine distance function
+# Haversine distance function (keep for fallback)
 def haversine_distance(coord1, coord2):
     """Calculate the great-circle distance between two points on Earth in km."""
     R = 6371  # Earth's radius in km
@@ -14,6 +16,34 @@ def haversine_distance(coord1, coord2):
     a = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlon / 2) ** 2
     c = 2 * atan2(sqrt(a), sqrt(1 - a))
     return R * c
+
+# Road network routing function using OpenRouteService
+def get_route_info(start_coords, end_coords, api_key):
+    """Get road distance and duration between two points using OpenRouteService API."""
+    base_url = "https://api.openrouteservice.org/v2/directions/driving-car"
+    
+    # Format coordinates for ORS API (lon,lat format)
+    coords = f"{start_coords[1]},{start_coords[0]}|{end_coords[1]},{end_coords[0]}"
+    
+    params = {
+        "api_key": api_key,
+        "coordinates": coords
+    }
+    
+    try:
+        response = requests.get(base_url, params=params)
+        if response.status_code == 200:
+            data = response.json()
+            # Extract distance (in meters) and duration (in seconds)
+            distance_km = data['routes'][0]['summary']['distance'] / 1000
+            duration_min = data['routes'][0]['summary']['duration'] / 60
+            return distance_km, duration_min
+        else:
+            print(f"API error: {response.status_code}")
+            return None, None
+    except Exception as e:
+        print(f"Error getting route information: {e}")
+        return None, None
 
 # Load model and encoders
 with open('hospital_prediction_model.pkl', 'rb') as f:
@@ -32,6 +62,8 @@ hospitals['location'] = hospitals[['Latitude', 'Longtitude']].values.tolist()
 # EMS base location (Marikina Rescue 161)
 EMS_BASE = [14.6628689, 121.1214235]
 AVERAGE_SPEED = 30  # km/h
+# Add your API key here (sign up at https://openrouteservice.org/dev/#/signup)
+ORS_API_KEY = "5b3ce3597851110001cf6248e9e7bf352181406b956089df63e2bb75"  # Replace with your actual API key
 
 # Valid severity and condition values
 VALID_SEVERITIES = ['low', 'medium', 'high']
@@ -88,14 +120,65 @@ while True:
 # Calculate derived features
 patient_location = [latitude, longitude]
 
-# Estimate distance_to_hospital_km (use closest hospital as proxy)
-distances = [haversine_distance(patient_location, h) for h in hospitals['location']]
-distance_to_hospital_km = min(distances) if distances else 0.0
+# Check if using road network or straight-line distance
+use_road_network = True
+if ORS_API_KEY == "your_api_key_here":
+    print("\nWarning: OpenRouteService API key not configured.")
+    print("Using straight-line distance calculations instead of road network.")
+    use_road_network = False
 
-# Estimate response_time_min (EMS base to patient + patient to closest hospital)
-distance_to_patient = haversine_distance(EMS_BASE, patient_location)
-time_to_patient = (distance_to_patient / AVERAGE_SPEED) * 60
-time_to_hospital = (distance_to_hospital_km / AVERAGE_SPEED) * 60
+# Calculate hospital distances and times
+hospital_info = []
+print("\nCalculating route information...")
+
+for idx, hospital in hospitals.iterrows():
+    hospital_coords = hospital['location']
+    hospital_id = hospital['ID']
+    
+    if use_road_network:
+        # Using road network to calculate distance and time
+        road_distance, road_duration = get_route_info(patient_location, hospital_coords, ORS_API_KEY)
+        
+        if road_distance is None:
+            # Fallback to haversine if API fails
+            print(f"Road routing failed for hospital {hospital_id}, using straight-line distance.")
+            haversine_dist = haversine_distance(patient_location, hospital_coords)
+            time_estimate = (haversine_dist / AVERAGE_SPEED) * 60
+            hospital_info.append((hospital_id, haversine_dist, time_estimate, True))
+        else:
+            hospital_info.append((hospital_id, road_distance, road_duration, False))
+        
+        # Sleep to avoid rate limiting if many hospitals
+        time.sleep(0.1)
+    else:
+        # Using straight-line distance
+        haversine_dist = haversine_distance(patient_location, hospital_coords)
+        time_estimate = (haversine_dist / AVERAGE_SPEED) * 60
+        hospital_info.append((hospital_id, haversine_dist, time_estimate, True))
+
+# Find closest hospital for distance calculation
+closest_hospital = min(hospital_info, key=lambda x: x[1])
+distance_to_hospital_km = closest_hospital[1]
+
+# Calculate response time using road network if available
+if use_road_network:
+    # EMS base to patient
+    road_dist_to_patient, road_time_to_patient = get_route_info(EMS_BASE, patient_location, ORS_API_KEY)
+    if road_dist_to_patient is None:
+        # Fallback to haversine
+        distance_to_patient = haversine_distance(EMS_BASE, patient_location)
+        time_to_patient = (distance_to_patient / AVERAGE_SPEED) * 60
+    else:
+        time_to_patient = road_time_to_patient
+    
+    # Patient to hospital
+    time_to_hospital = closest_hospital[2]
+else:
+    # Using straight-line distance
+    distance_to_patient = haversine_distance(EMS_BASE, patient_location)
+    time_to_patient = (distance_to_patient / AVERAGE_SPEED) * 60
+    time_to_hospital = closest_hospital[2]
+
 response_time_min = time_to_patient + time_to_hospital
 
 # Create input DataFrame for model
@@ -119,5 +202,21 @@ print(f"\nPredicted hospital ID: {predicted_hospital_id}")
 # Get hospital name
 hospital_name = hospitals[hospitals['ID'] == predicted_hospital_id]['Name'].iloc[0]
 print(f"Predicted hospital: {hospital_name}")
-print(f"Estimated distance to hospital: {distance_to_hospital_km:.6f} km")
-print(f"Estimated response time: {response_time_min:.6f} minutes")
+print(f"Estimated distance to hospital: {distance_to_hospital_km:.2f} km")
+print(f"Estimated response time: {response_time_min:.2f} minutes")
+
+# Add extra information about the routing method used
+if use_road_network:
+    print("\nRouting Information:")
+    print("✓ Using real road network distances and times")
+    
+    is_fallback = next((info[3] for info in hospital_info if info[0] == predicted_hospital_id), False)
+    if is_fallback:
+        print("⚠ API fallback used: calculations are based on straight-line approximation")
+    
+    print(f"EMS base to patient: {time_to_patient:.2f} minutes")
+    print(f"Patient to hospital: {time_to_hospital:.2f} minutes")
+else:
+    print("\nRouting Information:")
+    print("⚠ Using straight-line distance approximations")
+    print("  To use real road network, configure an OpenRouteService API key")
