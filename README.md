@@ -1,54 +1,54 @@
 <!-- @format -->
 
-# EMS
+# Emergency Medical Services (EMS) System
 
-How to use?
+This system predicts the optimal hospital for emergency patients based on location, severity, and medical condition, while calculating accurate response times considering actual road networks.
 
-1. Install the required import libraries
-2. Run `marikina_ems.py`, `generate_patient_ml.py`. This will create the following updated csv file for training dataset.
-3. Run `train_model.py`. This will train the `marikina_patients_ml.csv` dataset for model training.
-4. Finally, run `predict_hospital.py`. Use google maps to acquire latitude and longtitude
+How to Use
 
-Example:
+1. Install the required libraries `pip install pandas numpy scikit-learn folium requests`
+2. Setup the data
+      - Run marikina_ems.py to initialize hospital data
+      - Run generate_patient_ml.py to generate training dataset
+      - Run train_model.py to train the hospital prediction model
+3. Get an OpenRouteService API key (You can use my exposed API Key)
+      - Sign up at OpenRouteService
+      - Add your API key to predict_hospital.py (around line 64)
+4. Run the prediction system `python predict_hospital.py`
+5. Enter patient details when prompted
+      - Use Google Maps to get accurate latitude/longitude coordinates
+      - Select severity level (low, medium, high)
+      - Choose the appropriate medical condition
+6. Review the prediction results
+      - The system will show the recommended hospital with distance and timing
+      - Response time includes dispatch, travel, on-scene, and handover times
+      - You can visualize the route on an interactive map
 
-decha@ASUS_X415e MINGW64 /d/Documents/Python/EMS (main)
-$ D:/Python/Python313/python.exe d:/Documents/Python/EMS/predict_hospital.py
+``
+$ python predict_hospital.py
 Enter patient details for hospital prediction:
-Latitude (14.60 to 14.68): 14.6380867
-Longitude (121.07 to 121.13): 121.1280829
+Latitude (14.60 to 14.68): 14.665509
+Longitude (121.07 to 121.13): 121.128510
 Severity (low, medium, high): high
 Condition (Minor injury, Fever, Laceration, Fracture, Moderate respiratory distress, Abdominal pain, Heart attack, Major trauma, Stroke): Stroke
 
 Calculating route information...
-API error: 400
-Road routing failed for hospital 1, using straight-line distance.
-API error: 400
-Road routing failed for hospital 2, using straight-line distance.
-API error: 400
-Road routing failed for hospital 3, using straight-line distance.
-API error: 400
-Road routing failed for hospital 4, using straight-line distance.
-API error: 400
-Road routing failed for hospital 5, using straight-line distance.
-API error: 400
-Road routing failed for hospital 6, using straight-line distance.
-API error: 400
-Road routing failed for hospital 7, using straight-line distance.
-API error: 400
-Road routing failed for hospital 8, using straight-line distance.
-API error: 400
-Road routing failed for hospital 9, using straight-line distance.
-API error: 400
-Road routing failed for hospital 10, using straight-line distance.
-API error: 400
 
 Predicted hospital ID: 9
 Predicted hospital: Marikina Valley Medical Center
-Estimated distance to hospital: 1.94 km
-Estimated response time: 9.57 minutes
+Hospital Level: 3
+Estimated distance to hospital: 4.05 km
+
+Response Time Breakdown:
+• Dispatch time: 2.00 minutes
+• Travel to patient: 1.17 minutes
+• On-scene time: 10.00 minutes
+• Transport to hospital: 5.51 minutes
+• Hospital handover: 5.00 minutes
+• Total response time: 23.68 minutes
 
 Routing Information:
-✓ Using real road network distances and times
-⚠ API fallback used: calculations are based on straight-line approximation
-EMS base to patient: 5.69 minutes
-Patient to hospital: 3.88 minutes
+✓ Using real road network distances and times with OpenRouteService API
+EMS base to patient: 1.17 minutes
+Patient to hospital: 5.51 minutes
+``
