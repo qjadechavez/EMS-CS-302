@@ -1,30 +1,90 @@
 <!-- @format -->
 
-# Emergency Medical Services (EMS) System
+# EMS Route Optimization and Hospital Selection System
 
-This system predicts the optimal hospital for emergency patients based on location, severity, and medical condition, while calculating accurate response times considering actual road networks.
+## Project Description
 
-How to Use
+This Emergency Medical Services (EMS) Route Optimization and Hospital Selection System is a comprehensive healthcare simulation platform designed to predict the optimal hospital for emergency patients while calculating accurate response times using real-world road networks. The system integrates machine learning with geospatial routing to create a decision support tool for emergency medical services.
 
-1. Install the required libraries `pip install pandas numpy scikit-learn folium requests`
-2. Setup the data
-      - Run marikina_ems.py to initialize hospital data
-      - Run generate_patient_ml.py to generate training dataset
-      - Run train_model.py to train the hospital prediction model
-3. Get an OpenRouteService API key (You can use my exposed API Key)
-      - Sign up at OpenRouteService
-      - Add your API key to predict_hospital.py (around line 64)
-4. Run the prediction system `python predict_hospital.py`
-5. Enter patient details when prompted
-      - Use Google Maps to get accurate latitude/longitude coordinates
-      - Select severity level (low, medium, high)
-      - Choose the appropriate medical condition
-6. Review the prediction results
-      - The system will show the recommended hospital with distance and timing
-      - Response time includes dispatch, travel, on-scene, and handover times
-      - You can visualize the route on an interactive map
+## Key Features
 
-``
+### 1. Machine Learning Hospital Selection
+The system uses a trained machine learning model to recommend the most appropriate hospital based on:
+- Patient location (latitude/longitude coordinates)
+- Medical condition severity (low, medium, high)
+- Specific medical condition (9 different emergency types)
+- Expected travel times and distances
+
+### 2. Real-Time Route Calculation
+- Integrates with OpenRouteService API to calculate actual road network distances
+- Automatically falls back to straight-line (haversine) calculations when needed
+- Accounts for geographic obstacles, one-way streets, and road networks
+
+### 3. Comprehensive Response Time Modeling
+The system provides detailed time breakdowns reflecting real-world EMS operations:
+- Dispatch time (initial call processing and crew mobilization)
+- Travel time to patient location
+- On-scene assessment and stabilization time
+- Transport time to hospital
+- Hospital handover time
+
+### 4. Interactive Visualization
+- Generates dynamic HTML maps showing the complete emergency route
+- Displays EMS base, patient location, and selected hospital
+- Shows actual road network paths with time estimates
+- Includes tooltips with detailed timing information
+
+### 5. Flexible Input System
+- Accepts user-defined patient locations within a specified geographic area
+- Validates input coordinates against municipal boundaries
+- Allows selection from standardized medical conditions and severity levels
+
+## Technologies Used
+
+- **Python**: Core programming language
+- **Pandas/NumPy**: Data handling and numerical computations
+- **Scikit-learn**: Machine learning model training and prediction
+- **Folium**: Interactive map visualization
+- **OpenRouteService API**: Road network routing and travel time estimation
+- **JSON**: Data transfer between program components
+
+## Applications
+
+This system has potential applications in:
+- Emergency services planning and dispatch
+- Hospital resource allocation
+- EMS response time optimization
+- Patient outcome improvement through faster, more appropriate hospital selection
+- Training and education for emergency medical personnel
+- Public health policy planning for emergency services coverage
+
+## How to Use
+
+1. **Install the required libraries**
+   ```bash
+   pip install pandas numpy scikit-learn folium requests
+   ```
+2. **Setup the data**
+   - Run marikina_ems.py to initialize hospital data
+   - Run generate_patient_ml.py to generate training dataset
+   - Run train_model.py to train the hospital prediction model
+3. **Get an OpenRouteService API key (You can use my exposed API Key)**
+   - Sign up at OpenRouteService
+   - Add your API key to predict_hospital.py (around line 64)
+4. **Run the prediction system**
+   ```bash
+   python predict_hospital.py
+   ```
+5. **Enter patient details when prompted**
+   - Use Google Maps to get accurate latitude/longitude coordinates
+   - Select severity level (low, medium, high)
+   - Choose the appropriate medical condition
+6. **Review the prediction results**
+   - The system will show the recommended hospital with distance and timing
+   - Response time includes dispatch, travel, on-scene, and handover times
+   - You can visualize the route on an interactive map
+
+```
 $ python predict_hospital.py
 Enter patient details for hospital prediction:
 Latitude (14.60 to 14.68): 14.665509
@@ -51,4 +111,3 @@ Routing Information:
 ✓ Using real road network distances and times with OpenRouteService API
 EMS base to patient: 1.17 minutes
 Patient to hospital: 5.51 minutes
-``
