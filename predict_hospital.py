@@ -4,6 +4,9 @@ import numpy as np
 from math import radians, sin, cos, sqrt, atan2
 import requests
 import time
+import folium
+import webbrowser
+import os
 
 # Haversine distance function (keep for fallback)
 def haversine_distance(coord1, coord2):
@@ -12,7 +15,7 @@ def haversine_distance(coord1, coord2):
     lat1, lon1 = map(radians, coord1)
     lat2, lon2 = map(radians, coord2)
     dlat = lat2 - lat1
-    dlon = lon2 - lon1
+    dlon = lon2 - lon1  # Fix: changed from "dlon = dlon - lon1"
     a = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlon / 2) ** 2
     c = 2 * atan2(sqrt(a), sqrt(1 - a))
     return R * c
@@ -23,15 +26,19 @@ def get_route_info(start_coords, end_coords, api_key):
     base_url = "https://api.openrouteservice.org/v2/directions/driving-car"
     
     # Format coordinates for ORS API (lon,lat format)
-    coords = f"{start_coords[1]},{start_coords[0]}|{end_coords[1]},{end_coords[0]}"
+    coordinates = [[start_coords[1], start_coords[0]], [end_coords[1], end_coords[0]]]
     
-    params = {
-        "api_key": api_key,
-        "coordinates": coords
+    headers = {
+        "Authorization": api_key,
+        "Content-Type": "application/json; charset=utf-8"
+    }
+    
+    data = {
+        "coordinates": coordinates
     }
     
     try:
-        response = requests.get(base_url, params=params)
+        response = requests.post(base_url, headers=headers, json=data)
         if response.status_code == 200:
             data = response.json()
             # Extract distance (in meters) and duration (in seconds)
@@ -40,6 +47,7 @@ def get_route_info(start_coords, end_coords, api_key):
             return distance_km, duration_min
         else:
             print(f"API error: {response.status_code}")
+            print(f"Response details: {response.text}")  # Add this line to see the detailed error
             return None, None
     except Exception as e:
         print(f"Error getting route information: {e}")
@@ -201,14 +209,21 @@ print(f"\nPredicted hospital ID: {predicted_hospital_id}")
 
 # Get hospital name
 hospital_name = hospitals[hospitals['ID'] == predicted_hospital_id]['Name'].iloc[0]
+
+# Add this code to show hospital level
+hospital_level = "Unknown"  # Default value
+if 'Level' in hospitals.columns:
+    hospital_level = hospitals[hospitals['ID'] == predicted_hospital_id]['Level'].iloc[0]
+
 print(f"Predicted hospital: {hospital_name}")
+print(f"Hospital Level: {hospital_level}")
 print(f"Estimated distance to hospital: {distance_to_hospital_km:.2f} km")
 print(f"Estimated response time: {response_time_min:.2f} minutes")
 
 # Add extra information about the routing method used
 if use_road_network:
     print("\nRouting Information:")
-    print("✓ Using real road network distances and times")
+    print("✓ Using real road network distances and times with OpenRouteService API")
     
     is_fallback = next((info[3] for info in hospital_info if info[0] == predicted_hospital_id), False)
     if is_fallback:
@@ -220,3 +235,142 @@ else:
     print("\nRouting Information:")
     print("⚠ Using straight-line distance approximations")
     print("  To use real road network, configure an OpenRouteService API key")
+
+def visualize_results(ems_base, patient_location, hospital_id, hospital_name):
+    """
+    Create a visualization of the EMS route simulation with actual road networks
+    """
+    # Get hospital coordinates
+    hospital_coords = hospitals[hospitals['ID'] == hospital_id]['location'].iloc[0]
+    
+    # Create map centered between the three points
+    all_points = [ems_base, patient_location, hospital_coords]
+    avg_lat = sum(p[0] for p in all_points) / len(all_points)
+    avg_lon = sum(p[1] for p in all_points) / len(all_points)
+    
+    # Create the map
+    m = folium.Map(location=[avg_lat, avg_lon], zoom_start=14, tiles="OpenStreetMap")
+    
+    # Add markers
+    folium.Marker(
+        location=ems_base,
+        popup="EMS Base (Marikina Rescue 161)",
+        icon=folium.Icon(color="red", icon="ambulance", prefix="fa"),
+    ).add_to(m)
+    
+    folium.Marker(
+        location=patient_location,
+        popup="Patient Location",
+        icon=folium.Icon(color="blue", icon="user", prefix="fa"),
+    ).add_to(m)
+    
+    # Get hospital level
+    hospital_level = "Unknown"
+    if 'Level' in hospitals.columns:
+        hospital_level = hospitals[hospitals['ID'] == hospital_id]['Level'].iloc[0]
+
+    folium.Marker(
+        location=hospital_coords,
+        popup=f"Hospital: {hospital_name}<br>Level: {hospital_level}",
+        icon=folium.Icon(color="green", icon="hospital", prefix="fa"),
+    ).add_to(m)
+    
+    # Get route geometries from OpenRouteService
+    def get_route_geometry(start, end):
+        """Get the detailed route geometry between two points"""
+        base_url = "https://api.openrouteservice.org/v2/directions/driving-car/geojson"
+        
+        # Format coordinates for ORS API (lon,lat format)
+        coordinates = [[start[1], start[0]], [end[1], end[0]]]
+        
+        headers = {
+            "Authorization": ORS_API_KEY,
+            "Content-Type": "application/json; charset=utf-8"
+        }
+        
+        data = {
+            "coordinates": coordinates
+        }
+        
+        try:
+            response = requests.post(base_url, headers=headers, json=data)
+            if response.status_code == 200:
+                return response.json()
+            else:
+                print(f"API error getting route geometry: {response.status_code}")
+                return None
+        except Exception as e:
+            print(f"Error getting route geometry: {e}")
+            return None
+    
+    # Try to get EMS to Patient route
+    ems_to_patient_route = get_route_geometry(ems_base, patient_location)
+    if ems_to_patient_route:
+        # Add the GeoJSON to the map
+        folium.GeoJson(
+            ems_to_patient_route,
+            name="EMS to Patient",
+            style_function=lambda x: {
+                "color": "red",
+                "weight": 4,
+                "opacity": 0.8
+            },
+            tooltip=f"EMS to Patient: {time_to_patient:.2f} minutes"
+        ).add_to(m)
+    else:
+        # Fallback to straight line
+        folium.PolyLine(
+            locations=[ems_base, patient_location],
+            color="red",
+            weight=4,
+            opacity=0.8,
+            popup=f"EMS to Patient: {time_to_patient:.2f} minutes (straight line)",
+        ).add_to(m)
+    
+    # Try to get Patient to Hospital route
+    patient_to_hospital_route = get_route_geometry(patient_location, hospital_coords)
+    if patient_to_hospital_route:
+        # Add the GeoJSON to the map
+        folium.GeoJson(
+            patient_to_hospital_route,
+            name="Patient to Hospital",
+            style_function=lambda x: {
+                "color": "blue",
+                "weight": 4,
+                "opacity": 0.8
+            },
+            tooltip=f"Patient to Hospital: {time_to_hospital:.2f} minutes"
+        ).add_to(m)
+    else:
+        # Fallback to straight line
+        folium.PolyLine(
+            locations=[patient_location, hospital_coords],
+            color="blue",
+            weight=4,
+            opacity=0.8,
+            popup=f"Patient to Hospital: {time_to_hospital:.2f} minutes (straight line)",
+        ).add_to(m)
+    
+    # Save the map
+    map_file = "ems_route.html"
+    m.save(map_file)
+    
+    # Open the map in a web browser
+    print(f"\nOpening visualization in web browser...")
+    webbrowser.open('file://' + os.path.realpath(map_file))
+
+# Ask user if they want to visualize the results
+while True:
+    visualize = input("\nDo you want to visualize the route? (y/n): ").lower()
+    if visualize in ['y', 'n']:
+        break
+    print("Please enter 'y' or 'n'.")
+
+if visualize == 'y':
+    try:
+        import folium
+        visualize_results(EMS_BASE, patient_location, predicted_hospital_id, hospital_name)
+    except ImportError:
+        print("\nError: Folium package not installed. Install it using:")
+        print("pip install folium")
+        print("\nThen run the program again.")

@@ -5,7 +5,7 @@ from math import radians, sin, cos, sqrt, atan2
 
 def haversine_distance(coord1, coord2):
     """Calculate the great-circle distance between two points on Earth in km."""
-    R = 6371  # Earth's radius in km
+    R = 6371
     lat1, lon1 = map(radians, coord1)
     lat2, lon2 = map(radians, coord2)
     dlat = lat2 - lat1

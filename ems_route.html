@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    
+        <script>
+            L_NO_TOUCH = false;
+            L_DISABLE_3D = false;
+        </script>
+    
+    <style>html, body {width: 100%;height: 100%;margin: 0;padding: 0;}</style>
+    <style>#map {position:absolute;top:0;bottom:0;right:0;left:0;}</style>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_7baf8a1858b2daa5f8b14929037421d6 {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+                .leaflet-container { font-size: 1rem; }
+            </style>
+        
+</head>
+<body>
+    
+    
+            <div class="folium-map" id="map_7baf8a1858b2daa5f8b14929037421d6" ></div>
+        
+</body>
+<script>
+    
+    
+            var map_7baf8a1858b2daa5f8b14929037421d6 = L.map(
+                "map_7baf8a1858b2daa5f8b14929037421d6",
+                {
+                    center: [14.655827033333333, 121.11119289999999],
+                    crs: L.CRS.EPSG3857,
+                    ...{
+  "zoom": 14,
+  "zoomControl": true,
+  "preferCanvas": false,
+}
+
+                }
+            );
+
+            
+
+        
+    
+            var tile_layer_70776047be15d79b1510cd0008c518c9 = L.tileLayer(
+                "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+                {
+  "minZoom": 0,
+  "maxZoom": 19,
+  "maxNativeZoom": 19,
+  "noWrap": false,
+  "attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors",
+  "subdomains": "abc",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1,
+}
+
+            );
+        
+    
+            tile_layer_70776047be15d79b1510cd0008c518c9.addTo(map_7baf8a1858b2daa5f8b14929037421d6);
+        
+    
+            var marker_8a12d57e73450ab345d01dbdf55baf7f = L.marker(
+                [14.6628689, 121.1214235],
+                {
+}
+            ).addTo(map_7baf8a1858b2daa5f8b14929037421d6);
+        
+    
+            var icon_4b57fdeb36fb3509b5c33af103d87559 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "red",
+  "iconColor": "white",
+  "icon": "ambulance",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_a58d78b75080deee5c394d40a012ab49 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_eb73baa1856d9723276bb799392a648a = $(`<div id="html_eb73baa1856d9723276bb799392a648a" style="width: 100.0%; height: 100.0%;">EMS Base (Marikina Rescue 161)</div>`)[0];
+                popup_a58d78b75080deee5c394d40a012ab49.setContent(html_eb73baa1856d9723276bb799392a648a);
+            
+        
+
+        marker_8a12d57e73450ab345d01dbdf55baf7f.bindPopup(popup_a58d78b75080deee5c394d40a012ab49)
+        ;
+
+        
+    
+    
+                marker_8a12d57e73450ab345d01dbdf55baf7f.setIcon(icon_4b57fdeb36fb3509b5c33af103d87559);
+            
+    
+            var marker_3fe5fe7cd5a5490456c06ba5c6ff81a3 = L.marker(
+                [14.669716, 121.1080345],
+                {
+}
+            ).addTo(map_7baf8a1858b2daa5f8b14929037421d6);
+        
+    
+            var icon_f2cdb8db9e0b5ce1808fa9953bbed4b7 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "blue",
+  "iconColor": "white",
+  "icon": "user",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_dd01fc0eddaa66f997a1467cc747dc4d = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_ee66ab11610ddcfeb42a6a5ea585c770 = $(`<div id="html_ee66ab11610ddcfeb42a6a5ea585c770" style="width: 100.0%; height: 100.0%;">Patient Location</div>`)[0];
+                popup_dd01fc0eddaa66f997a1467cc747dc4d.setContent(html_ee66ab11610ddcfeb42a6a5ea585c770);
+            
+        
+
+        marker_3fe5fe7cd5a5490456c06ba5c6ff81a3.bindPopup(popup_dd01fc0eddaa66f997a1467cc747dc4d)
+        ;
+
+        
+    
+    
+                marker_3fe5fe7cd5a5490456c06ba5c6ff81a3.setIcon(icon_f2cdb8db9e0b5ce1808fa9953bbed4b7);
+            
+    
+            var marker_a68c6d97ab3f5bc47bdedf9c78426e6d = L.marker(
+                [14.6348962, 121.1041207],
+                {
+}
+            ).addTo(map_7baf8a1858b2daa5f8b14929037421d6);
+        
+    
+            var icon_45d447a7f6de41784e713c50c61865fc = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "green",
+  "iconColor": "white",
+  "icon": "hospital",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_42a9d2fc100debff54410158dca59cf9 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_91dbc762439614ba1197523a0d7a9116 = $(`<div id="html_91dbc762439614ba1197523a0d7a9116" style="width: 100.0%; height: 100.0%;">Hospital: Marikina Valley Medical Center<br>Level: 3</div>`)[0];
+                popup_42a9d2fc100debff54410158dca59cf9.setContent(html_91dbc762439614ba1197523a0d7a9116);
+            
+        
+
+        marker_a68c6d97ab3f5bc47bdedf9c78426e6d.bindPopup(popup_42a9d2fc100debff54410158dca59cf9)
+        ;
+
+        
+    
+    
+                marker_a68c6d97ab3f5bc47bdedf9c78426e6d.setIcon(icon_45d447a7f6de41784e713c50c61865fc);
+            
+    
+        function geo_json_3d54bd0a9405932c4f446c185ddfbde7_styler(feature) {
+            switch(feature.id) {
+                default:
+                    return {"color": "red", "opacity": 0.8, "weight": 4};
+            }
+        }
+
+        function geo_json_3d54bd0a9405932c4f446c185ddfbde7_onEachFeature(feature, layer) {
+            layer.on({
+            });
+        };
+        var geo_json_3d54bd0a9405932c4f446c185ddfbde7 = L.geoJson(null, {
+                onEachFeature: geo_json_3d54bd0a9405932c4f446c185ddfbde7_onEachFeature,
+            
+                style: geo_json_3d54bd0a9405932c4f446c185ddfbde7_styler,
+            ...{
+}
+        });
+
+        function geo_json_3d54bd0a9405932c4f446c185ddfbde7_add (data) {
+            geo_json_3d54bd0a9405932c4f446c185ddfbde7
+                .addData(data);
+        }
+            geo_json_3d54bd0a9405932c4f446c185ddfbde7_add({"bbox": [121.106192, 14.659644, 121.121464, 14.669712], "features": [{"bbox": [121.106192, 14.659644, 121.121464, 14.669712], "geometry": {"coordinates": [[121.121464, 14.662708], [121.121464, 14.662674], [121.121222, 14.662661], [121.121031, 14.662611], [121.120963, 14.66259], [121.120814, 14.662546], [121.120727, 14.662518], [121.120591, 14.662476], [121.120241, 14.662454], [121.119899, 14.662496], [121.119712, 14.662576], [121.119536, 14.662674], [121.119488, 14.662705], [121.119214, 14.662889], [121.119016, 14.662979], [121.118936, 14.663007], [121.118745, 14.663032], [121.116837, 14.662994], [121.116757, 14.662982], [121.115639, 14.662506], [121.114095, 14.661976], [121.113986, 14.661939], [121.113587, 14.661802], [121.113454, 14.661757], [121.113276, 14.661696], [121.112475, 14.661402], [121.111495, 14.661075], [121.110306, 14.660657], [121.109401, 14.660336], [121.109198, 14.660273], [121.109084, 14.660204], [121.108677, 14.659644], [121.108463, 14.659764], [121.108613, 14.659991], [121.108712, 14.660187], [121.109383, 14.661881], [121.108858, 14.661963], [121.108438, 14.662044], [121.108091, 14.662211], [121.107675, 14.662409], [121.107258, 14.662605], [121.106759, 14.662827], [121.106322, 14.662989], [121.106192, 14.663038], [121.1063, 14.663348], [121.106572, 14.664159], [121.106638, 14.664377], [121.106856, 14.665118], [121.106867, 14.665153], [121.10688, 14.665196], [121.10696, 14.665446], [121.10713, 14.665975], [121.10728, 14.666444], [121.107518, 14.667183], [121.107633, 14.667544], [121.1077, 14.667753], [121.107742, 14.667883], [121.107763, 14.667947], [121.108001, 14.668687], [121.108048, 14.668836], [121.108121, 14.669063], [121.108204, 14.669322], [121.108297, 14.669635], [121.108033, 14.669712]], "type": "LineString"}, "id": "0", "properties": {"extras": {"roadaccessrestrictions": {"summary": [{"amount": 99.87, "distance": 2932.3, "value": 0.0}, {"amount": 0.13, "distance": 3.8, "value": 4.0}], "values": [[0, 1, 4], [1, 63, 0]]}}, "segments": [{"distance": 2936.1, "duration": 276.1, "steps": [{"distance": 3.8, "duration": 2.7, "instruction": "Head south", "name": "-", "type": 11, "way_points": [0, 1]}, {"distance": 311.2, "duration": 20.4, "instruction": "Turn right onto Fortune Avenue", "name": "Fortune Avenue", "type": 1, "way_points": [1, 16]}, {"distance": 1172.0, "duration": 100.0, "instruction": "Continue straight onto C. M. Recto Street", "name": "C. M. Recto Street", "type": 6, "way_points": [16, 31]}, {"distance": 26.6, "duration": 6.4, "instruction": "Turn right onto Ilang-Ilang Street", "name": "Ilang-Ilang Street", "type": 1, "way_points": [31, 32]}, {"distance": 256.0, "duration": 23.0, "instruction": "Turn right onto Sampaguita", "name": "Sampaguita", "type": 1, "way_points": [32, 35]}, {"distance": 369.1, "duration": 39.9, "instruction": "Turn left onto Dahlia Street", "name": "Dahlia Street", "type": 0, "way_points": [35, 43]}, {"distance": 767.8, "duration": 76.6, "instruction": "Turn right onto Jose P. Rizal Street", "name": "Jose P. Rizal Street", "type": 1, "way_points": [43, 62]}, {"distance": 29.6, "duration": 7.1, "instruction": "Turn left onto Buenmar Street", "name": "Buenmar Street", "type": 0, "way_points": [62, 63]}, {"distance": 0.0, "duration": 0.0, "instruction": "Arrive at Buenmar Street, straight ahead", "name": "-", "type": 10, "way_points": [63, 63]}]}], "summary": {"distance": 2936.1, "duration": 276.1}, "warnings": [{"code": 1, "message": "There may be restrictions on some roads"}], "way_points": [0, 63]}, "type": "Feature"}], "metadata": {"attribution": "openrouteservice.org | OpenStreetMap contributors", "engine": {"build_date": "2025-05-06T08:31:01Z", "graph_date": "2025-05-11T13:01:50Z", "version": "9.2.0"}, "query": {"coordinates": [[121.1214235, 14.6628689], [121.1080345, 14.669716]], "format": "geojson", "profile": "driving-car", "profileName": "driving-car"}, "service": "routing", "timestamp": 1747183387355}, "type": "FeatureCollection"});
+
+        
+    
+            geo_json_3d54bd0a9405932c4f446c185ddfbde7.bindTooltip(
+                `<div>
+                     EMS to Patient: 4.60 minutes
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            geo_json_3d54bd0a9405932c4f446c185ddfbde7.addTo(map_7baf8a1858b2daa5f8b14929037421d6);
+        
+    
+        function geo_json_6e638ff20328705b5ece19aec7fe9652_styler(feature) {
+            switch(feature.id) {
+                default:
+                    return {"color": "blue", "opacity": 0.8, "weight": 4};
+            }
+        }
+
+        function geo_json_6e638ff20328705b5ece19aec7fe9652_onEachFeature(feature, layer) {
+            layer.on({
+            });
+        };
+        var geo_json_6e638ff20328705b5ece19aec7fe9652 = L.geoJson(null, {
+                onEachFeature: geo_json_6e638ff20328705b5ece19aec7fe9652_onEachFeature,
+            
+                style: geo_json_6e638ff20328705b5ece19aec7fe9652_styler,
+            ...{
+}
+        });
+
+        function geo_json_6e638ff20328705b5ece19aec7fe9652_add (data) {
+            geo_json_6e638ff20328705b5ece19aec7fe9652
+                .addData(data);
+        }
+            geo_json_6e638ff20328705b5ece19aec7fe9652_add({"bbox": [121.09792, 14.634503, 121.108297, 14.669712], "features": [{"bbox": [121.09792, 14.634503, 121.108297, 14.669712], "geometry": {"coordinates": [[121.108033, 14.669712], [121.108297, 14.669635], [121.108204, 14.669322], [121.108121, 14.669063], [121.108048, 14.668836], [121.108001, 14.668687], [121.107763, 14.667947], [121.107742, 14.667883], [121.1077, 14.667753], [121.107633, 14.667544], [121.107518, 14.667183], [121.10728, 14.666444], [121.10713, 14.665975], [121.10696, 14.665446], [121.10688, 14.665196], [121.106867, 14.665153], [121.106856, 14.665118], [121.106638, 14.664377], [121.106572, 14.664159], [121.1063, 14.663348], [121.106192, 14.663038], [121.106113, 14.662824], [121.106089, 14.66276], [121.105958, 14.662408], [121.105776, 14.661987], [121.105558, 14.661526], [121.10541, 14.661236], [121.105351, 14.661121], [121.105017, 14.660392], [121.104971, 14.66029], [121.104871, 14.66009], [121.104465, 14.65923], [121.104375, 14.659044], [121.10418, 14.658642], [121.10413, 14.658536], [121.103953, 14.658132], [121.103851, 14.657909], [121.103715, 14.657617], [121.103676, 14.657525], [121.103397, 14.655832], [121.103169, 14.654339], [121.103135, 14.654025], [121.103134, 14.653232], [121.103134, 14.653115], [121.103134, 14.653011], [121.103114, 14.652121], [121.10311, 14.652038], [121.103074, 14.651479], [121.103019, 14.651214], [121.102844, 14.65072], [121.103093, 14.650712], [121.103714, 14.650896], [121.103634, 14.650655], [121.102867, 14.649054], [121.101838, 14.646845], [121.100767, 14.644645], [121.100427, 14.643932], [121.100348, 14.643766], [121.099739, 14.642454], [121.098835, 14.640552], [121.098801, 14.640481], [121.098714, 14.640296], [121.09854, 14.639892], [121.098437, 14.639655], [121.098291, 14.639199], [121.098112, 14.638561], [121.098066, 14.638394], [121.09792, 14.637735], [121.09797, 14.63772], [121.098884, 14.637484], [121.099417, 14.637346], [121.099205, 14.636472], [121.099206, 14.636423], [121.099293, 14.635504], [121.099755, 14.635427], [121.100632, 14.635253], [121.100872, 14.635207], [121.10177, 14.635025], [121.102, 14.634976], [121.10247, 14.634874], [121.102633, 14.634839], [121.102819, 14.634798], [121.102875, 14.634786], [121.103011, 14.634757], [121.103554, 14.634638], [121.103629, 14.634622], [121.10416, 14.634503], [121.104191, 14.634637]], "type": "LineString"}, "id": "0", "properties": {"segments": [{"distance": 4848.5, "duration": 419.7, "steps": [{"distance": 29.6, "duration": 7.1, "instruction": "Head east on Buenmar Street", "name": "Buenmar Street", "type": 11, "way_points": [0, 1]}, {"distance": 2203.1, "duration": 189.3, "instruction": "Turn right onto Jose P. Rizal Street", "name": "Jose P. Rizal Street", "type": 1, "way_points": [1, 49]}, {"distance": 96.7, "duration": 16.5, "instruction": "Turn sharp left onto Bayan-Bayanan Avenue", "name": "Bayan-Bayanan Avenue", "type": 2, "way_points": [49, 51]}, {"distance": 1593.8, "duration": 114.7, "instruction": "Turn sharp right onto Era\u00f1o G. Manalo Street", "name": "Era\u00f1o G. Manalo Street", "type": 3, "way_points": [51, 67]}, {"distance": 166.8, "duration": 13.3, "instruction": "Turn left onto Guerilla Street", "name": "Guerilla Street", "type": 0, "way_points": [67, 70]}, {"distance": 207.9, "duration": 18.7, "instruction": "Turn right onto Toyota Avenue", "name": "Toyota Avenue", "type": 1, "way_points": [70, 73]}, {"distance": 535.3, "duration": 54.5, "instruction": "Turn left onto Sumulong Highway", "name": "Sumulong Highway", "type": 0, "way_points": [73, 86]}, {"distance": 15.2, "duration": 5.5, "instruction": "Turn left", "name": "-", "type": 0, "way_points": [86, 87]}, {"distance": 0.0, "duration": 0.0, "instruction": "Arrive at your destination, on the left", "name": "-", "type": 10, "way_points": [87, 87]}]}], "summary": {"distance": 4848.5, "duration": 419.7}, "way_points": [0, 87]}, "type": "Feature"}], "metadata": {"attribution": "openrouteservice.org | OpenStreetMap contributors", "engine": {"build_date": "2025-05-06T08:31:01Z", "graph_date": "2025-05-11T13:01:50Z", "version": "9.2.0"}, "query": {"coordinates": [[121.1080345, 14.669716], [121.1041207, 14.6348962]], "format": "geojson", "profile": "driving-car", "profileName": "driving-car"}, "service": "routing", "timestamp": 1747183388237}, "type": "FeatureCollection"});
+
+        
+    
+            geo_json_6e638ff20328705b5ece19aec7fe9652.bindTooltip(
+                `<div>
+                     Patient to Hospital: 4.60 minutes
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            geo_json_6e638ff20328705b5ece19aec7fe9652.addTo(map_7baf8a1858b2daa5f8b14929037421d6);
+        
+</script>
+</html>
