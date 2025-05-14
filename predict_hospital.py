@@ -11,7 +11,7 @@ import subprocess
 # Haversine distance function (keep for fallback)
 def haversine_distance(coord1, coord2):
     """Calculate the great-circle distance between two points on Earth in km."""
-    R = 6371  # Earth's radius in km
+    R = 6371 
     lat1, lon1 = map(radians, coord1)
     lat2, lon2 = map(radians, coord2)
     dlat = lat2 - lat1
@@ -71,14 +71,14 @@ hospitals['location'] = hospitals[['Latitude', 'Longtitude']].values.tolist()
 EMS_BASE = [14.6628689, 121.1214235]
 AVERAGE_SPEED = 30  # km/h
 # Add your API key here (sign up at https://openrouteservice.org/dev/#/signup)
-ORS_API_KEY = "5b3ce3597851110001cf6248e9e7bf352181406b956089df63e2bb75"  # Replace with your actual API key
+ORS_API_KEY = "5b3ce3597851110001cf6248e9e7bf352181406b956089df63e2bb75" 
 
 # Valid severity and condition values
 VALID_SEVERITIES = ['low', 'medium', 'high']
 VALID_CONDITIONS = [
-    'Minor injury', 'Fever', 'Laceration',  # Low
-    'Fracture', 'Moderate respiratory distress', 'Abdominal pain',  # Medium
-    'Heart attack', 'Major trauma', 'Stroke'  # High
+    'Minor injury', 'Fever', 'Laceration', 
+    'Fracture', 'Moderate respiratory distress', 'Abdominal pain',  
+    'Heart attack', 'Major trauma', 'Stroke'  
 ]
 
 MARIKINA_BBOX = {
