@@ -8,7 +8,7 @@ hospitals = pd.read_csv('./datasets/hospital/hospital_dataset (cleaned).csv')
 ems = pd.read_csv('./datasets/ems/marikina_ems.csv')
 
 # Create map centered on Marikina City
-marikina_center = [14.64, 121.10]  # Approximate center of Marikina
+marikina_center = [14.64, 121.10]  
 m = folium.Map(location=marikina_center, zoom_start=13, tiles='OpenStreetMap')
 
 # Add patient locations (blue markers with clustering)
