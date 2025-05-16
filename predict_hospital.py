@@ -54,13 +54,13 @@ def get_route_info(start_coords, end_coords, api_key):
         return None, None
 
 # Load model and encoders
-with open('hospital_prediction_model.pkl', 'rb') as f:
+with open('./models/hospital_prediction_model.pkl', 'rb') as f:
     model = pickle.load(f)
 
-with open('le_severity.pkl', 'rb') as f:
+with open('./models/le_severity.pkl', 'rb') as f:
     le_severity = pickle.load(f)
 
-with open('le_condition.pkl', 'rb') as f:
+with open('./models/le_condition.pkl', 'rb') as f:
     le_condition = pickle.load(f)
 
 # Load hospital dataset for distance calculations
@@ -70,7 +70,7 @@ hospitals['location'] = hospitals[['Latitude', 'Longtitude']].values.tolist()
 # EMS base location (Marikina Rescue 161)
 EMS_BASE = [14.6628689, 121.1214235]
 AVERAGE_SPEED = 30  # km/h
-# Add your API key here (sign up at https://openrouteservice.org/dev/#/signup)
+
 ORS_API_KEY = "5b3ce3597851110001cf6248e9e7bf352181406b956089df63e2bb75" 
 
 # Valid severity and condition values

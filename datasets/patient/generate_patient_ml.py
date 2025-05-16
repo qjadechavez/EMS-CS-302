@@ -118,6 +118,6 @@ for i in range(NUM_PATIENTS):
 patients_df = pd.DataFrame(patients)
 patients_df = patients_df[['patient_id', 'latitude', 'longitude', 'severity', 'condition', 'Call_Time', 
                           'hospital_id', 'distance_to_hospital_km', 'response_time_min']]
-patients_df.to_csv('marikina_patients_ml.csv', index=False)
+patients_df.to_csv('./datasets/patient/marikina_patients_ml.csv', index=False)
 print("Patient Dataset for ML (first 10 rows):")
 print(patients_df.head(10).to_string(index=False))

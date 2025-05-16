@@ -6,7 +6,7 @@ from sklearn.metrics import accuracy_score, classification_report
 import pickle
 
 # Load dataset
-df = pd.read_csv('marikina_patients_ml.csv')
+df = pd.read_csv('./datasets/patient/marikina_patients_ml.csv')
 
 # Select features and target, create a copy to avoid SettingWithCopyWarning
 X = df[['latitude', 'longitude', 'severity', 'condition', 'distance_to_hospital_km', 'response_time_min']].copy()
@@ -41,11 +41,11 @@ print("\nFeature Importance:")
 print(feature_importance)
 
 # Save model and encoders
-with open('hospital_prediction_model.pkl', 'wb') as f:
+with open('./models/hospital_prediction_model.pkl', 'wb') as f:
     pickle.dump(model, f)
-with open('le_severity.pkl', 'wb') as f:
+with open('./models/le_severity.pkl', 'wb') as f:
     pickle.dump(le_severity, f)
-with open('le_condition.pkl', 'wb') as f:
+with open('./models/le_condition.pkl', 'wb') as f:
     pickle.dump(le_condition, f)
 
 print("Model training complete. Saved as hospital_prediction_model.pkl")
