@@ -285,7 +285,7 @@ def main():
                 
                 # Call the visualization script
                 print("\nOpening visualization in web browser...")
-                subprocess.run(["python", "visualize_route.py"])
+                subprocess.run(["python", "./utilities/visualize_route.py"])
                 
             except TypeError as e:
                 print(f"\nError serializing data: {e}")

@@ -137,7 +137,7 @@ def visualize_ems_route(route_data):
         ).add_to(m)
     
     # Save the map
-    map_file = "ems_route.html"
+    map_file = "./utilities/ems_route.html"
     m.save(map_file)
     
     # Open the map in a web browser
