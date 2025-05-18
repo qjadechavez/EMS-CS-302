@@ -5,13 +5,13 @@ from math import radians, sin, cos, sqrt, atan2
 
 def haversine_distance(coord1, coord2):
     """Calculate the great-circle distance between two points on Earth in km."""
-    R = 6371
+    R = 6371  # Earth's radius in kilometers
     lat1, lon1 = map(radians, coord1)
     lat2, lon2 = map(radians, coord2)
     dlat = lat2 - lat1
     dlon = lon2 - lon1
-    a = sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlon/2)**2
-    c = 2 * atan2(sqrt(a), sqrt(1-a))
+    a = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlon / 2) ** 2
+    c = 2 * atan2(sqrt(a), sqrt(1 - a))
     return R * c
 
 # Load hospital dataset
@@ -20,14 +20,56 @@ hospitals['location'] = hospitals[['Latitude', 'Longtitude']].values.tolist()
 hospitals = hospitals.rename(columns={'ID': 'id', 'Level': 'level', 'Has ER': 'has_er'})
 hospitals = hospitals[['id', 'Name', 'Address', 'level', 'location', 'has_er']].to_dict('records')
 
-# Load EMS dataset
-ems = pd.read_csv('./datasets/ems/marikina_ems.csv')
-ems['base_location'] = ems[['base_latitude', 'base_longitude']].values.tolist()
-ems['last_available_time'] = pd.to_datetime(ems['last_available_time'])
-ems = ems.to_dict('records')
+# Define EMS bases directly since there might be issues with the CSV structure
+EMS_BASES = [
+    {'base_id': 163, 'base_name': '163 Base - Barangay Hall IVC', 'latitude': 14.6270218, 'longitude': 121.0797032},
+    {'base_id': 166, 'base_name': '166 Base - CHO Office, Barangay Sto.niño', 'latitude': 14.6399746, 'longitude': 121.0965973},
+    {'base_id': 167, 'base_name': '167 Base - Barangay Hall Kalumpang', 'latitude': 14.624179, 'longitude': 121.0933239},
+    {'base_id': 164, 'base_name': '164 Base - DRRMO Building, Barangay Fortune', 'latitude': 14.6628689, 'longitude': 121.1214235},
+    {'base_id': 165, 'base_name': '165 Base - St. Benedict Barangay Nangka', 'latitude': 14.6737274, 'longitude': 121.108795},
+    {'base_id': 169, 'base_name': '169 Base - Pugad Lawin, Barangay Fortune', 'latitude': 14.6584306, 'longitude': 121.1312048}
+]
+
+# Initialize EMS units
+START_TIME = datetime(2025, 5, 13, 8, 0, 0)
+ems = []
+ems_id = 1
+
+# Create EMS units for each base
+for base in EMS_BASES:
+    # Add 2 ambulances to bases 163, 166, 167
+    num_ambulances = 2 if base['base_id'] in [163, 166, 167] else 1
+    
+    for i in range(num_ambulances):
+        ems.append({
+            'ems_id': ems_id,
+            'type': 'Ambulance',
+            'base_id': base['base_id'],
+            'base_name': base['base_name'],
+            'base_latitude': base['latitude'],
+            'base_longitude': base['longitude'],
+            'base_location': [base['latitude'], base['longitude']],
+            'status': 'Available',
+            'last_available_time': START_TIME
+        })
+        ems_id += 1
+    
+    # Add 1 rescue vehicle to each base
+    ems.append({
+        'ems_id': ems_id,
+        'type': 'Rescue',
+        'base_id': base['base_id'],
+        'base_name': base['base_name'],
+        'base_latitude': base['latitude'],
+        'base_longitude': base['longitude'],
+        'base_location': [base['latitude'], base['longitude']],
+        'status': 'Available',
+        'last_available_time': START_TIME
+    })
+    ems_id += 1
 
 # Parameters
-NUM_PATIENTS = 1000
+NUM_PATIENTS = 6000
 MARIKINA_BBOX = {'lat_min': 14.60, 'lat_max': 14.68, 'lon_min': 121.07, 'lon_max': 121.13}
 SEVERITY_WEIGHTS = {'low': 0.5, 'medium': 0.3, 'high': 0.2}
 CONDITIONS = {
@@ -35,7 +77,6 @@ CONDITIONS = {
     'medium': ['Fracture', 'Moderate respiratory distress', 'Abdominal pain'],
     'high': ['Heart attack', 'Major trauma', 'Stroke']
 }
-START_TIME = datetime(2025, 5, 13, 8, 0, 0)
 AVERAGE_SPEED = 30  # km/h
 
 # Generate patient data with EMS simulation
@@ -56,19 +97,26 @@ for i in range(NUM_PATIENTS):
     time_offset = timedelta(minutes=np.random.randint(5, 15))
     call_time = current_time + time_offset
     
-    # Find available ambulance
+    # Find available ambulance from the closest base
     available_ems = [unit for unit in ems if unit['status'] == 'Available' and unit['type'] == 'Ambulance' 
                      and unit['last_available_time'] <= call_time]
+    
     if not available_ems:
         next_available = min([unit['last_available_time'] for unit in ems if unit['type'] == 'Ambulance'])
         call_time = max(call_time, next_available)
         available_ems = [unit for unit in ems if unit['status'] == 'Available' and unit['type'] == 'Ambulance']
     
-    ems_unit = available_ems[0] if available_ems else ems[0]
+    # Find closest EMS base to patient location
+    ems_distances = []
+    for unit in available_ems:
+        distance = haversine_distance(unit['base_location'], patient_location)
+        ems_distances.append((unit, distance))
+    
+    # Select the closest available ambulance
+    ems_unit, distance_to_patient = min(ems_distances, key=lambda x: x[1])
     ems_unit['status'] = 'Dispatched'
     
     # Calculate response time to patient
-    distance_to_patient = haversine_distance(ems_unit['base_location'], patient_location)
     time_to_patient = (distance_to_patient / AVERAGE_SPEED) * 60
     
     # Select hospital
@@ -93,7 +141,10 @@ for i in range(NUM_PATIENTS):
         time_to_hospital = 0
     
     # Calculate total response time
-    response_time = time_to_patient + time_to_hospital
+    dispatch_time = 2  # minutes
+    on_scene_time = 10  # minutes
+    handover_time = 5   # minutes
+    response_time = dispatch_time + time_to_patient + on_scene_time + time_to_hospital + handover_time
     
     # Update EMS status
     ems_unit['status'] = 'Available'
@@ -109,7 +160,9 @@ for i in range(NUM_PATIENTS):
         'Call_Time': call_time.strftime('%Y-%m-%d %H:%M:%S'),
         'hospital_id': hospital_id,
         'distance_to_hospital_km': distance_to_hospital,
-        'response_time_min': response_time
+        'response_time_min': response_time,
+        'ems_base_id': ems_unit['base_id'],
+        'ems_base_name': ems_unit['base_name']
     })
     
     current_time = call_time
@@ -117,7 +170,16 @@ for i in range(NUM_PATIENTS):
 # Create DataFrame and save
 patients_df = pd.DataFrame(patients)
 patients_df = patients_df[['patient_id', 'latitude', 'longitude', 'severity', 'condition', 'Call_Time', 
-                          'hospital_id', 'distance_to_hospital_km', 'response_time_min']]
+                          'hospital_id', 'distance_to_hospital_km', 'response_time_min', 
+                          'ems_base_id', 'ems_base_name']]
 patients_df.to_csv('./datasets/patient/marikina_patients_ml.csv', index=False)
 print("Patient Dataset for ML (first 10 rows):")
 print(patients_df.head(10).to_string(index=False))
+
+# Also save a version without the EMS base info for backward compatibility
+patients_df_simple = patients_df.drop(['ems_base_id', 'ems_base_name'], axis=1)
+patients_df_simple.to_csv('./datasets/patient/marikina_patients_ml_simple.csv', index=False)
+
+# Save the EMS data for reference
+ems_df = pd.DataFrame(ems)
+ems_df.to_csv('./datasets/ems/marikina_ems_generated.csv', index=False)

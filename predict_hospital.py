@@ -13,7 +13,7 @@ def haversine_distance(coord1, coord2):
     lat1, lon1 = map(radians, coord1)
     lat2, lon2 = map(radians, coord2)
     dlat = lat2 - lat1
-    dlon = lon2 - lon1  # Fix: changed from "dlon = dlon - lon1"
+    dlon = lon2 - lon1
     a = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlon / 2) ** 2
     c = 2 * atan2(sqrt(a), sqrt(1 - a))
     return R * c
@@ -28,7 +28,7 @@ def get_route_info(start_coords, end_coords, api_key):
     
     headers = {
         "Authorization": api_key,
-        "Content-Type": "application/json; charset=utf-8"
+        "Content-Type": "application/json; charset=utf-8" 
     }
     
     data = {
@@ -65,10 +65,18 @@ with open('./models/le_condition.pkl', 'rb') as f:
 hospitals = pd.read_csv('./datasets/hospital/hospital_dataset (cleaned).csv')
 hospitals['location'] = hospitals[['Latitude', 'Longtitude']].values.tolist()
 
-# EMS base location (Marikina Rescue 161)
-EMS_BASE = [14.6628689, 121.1214235]
-AVERAGE_SPEED = 30
 
+# Define multiple EMS bases with their locations and names
+EMS_BASES = [
+    {'base_id': 163, 'base_name': '163 Base - Barangay Hall IVC', 'latitude': 14.6270218, 'longitude': 121.0797032},
+    {'base_id': 166, 'base_name': '166 Base - CHO Office, Barangay Sto.niño', 'latitude': 14.6399746, 'longitude': 121.0965973},
+    {'base_id': 167, 'base_name': '167 Base - Barangay Hall Kalumpang', 'latitude': 14.624179, 'longitude': 121.0933239},
+    {'base_id': 164, 'base_name': '164 Base - DRRMO Building, Barangay Fortune', 'latitude': 14.6628689, 'longitude': 121.1214235},
+    {'base_id': 165, 'base_name': '165 Base - St. Benedict Barangay Nangka', 'latitude': 14.6737274, 'longitude': 121.108795},
+    {'base_id': 169, 'base_name': '169 Base - Pugad Lawin, Barangay Fortune', 'latitude': 14.6584306, 'longitude': 121.1312048}
+]
+
+AVERAGE_SPEED = 30  # km/h
 ORS_API_KEY = "5b3ce3597851110001cf6248e9e7bf352181406b956089df63e2bb75" 
 
 # Valid severity and condition values
@@ -127,17 +135,63 @@ def main():
     # Calculate derived features
     patient_location = [latitude, longitude]
 
-    # Check if using road network or straight-line distance
-    use_road_network = True
+    # Find the closest EMS base to the patient
+    ems_base_distances = []
+    use_road_network = True if ORS_API_KEY != "your_api_key_here" else False
+    
+    print("\nFinding closest EMS base...")
+    for base in EMS_BASES:
+        base_coords = [base['latitude'], base['longitude']]
+        
+        if use_road_network:
+            # Use road network distance if API key is available
+            road_distance, road_duration = get_route_info(base_coords, patient_location, ORS_API_KEY)
+            if road_distance is not None:
+                ems_base_distances.append({
+                    'base_id': base['base_id'],
+                    'base_name': base['base_name'],
+                    'coords': base_coords,
+                    'distance': road_distance,
+                    'time': road_duration,
+                    'is_road_distance': True
+                })
+                continue
+        
+        # Fallback to haversine distance
+        distance = haversine_distance(base_coords, patient_location)
+        time_estimate = (distance / AVERAGE_SPEED) * 60
+        ems_base_distances.append({
+            'base_id': base['base_id'],
+            'base_name': base['base_name'],
+            'coords': base_coords,
+            'distance': distance,
+            'time': time_estimate,
+            'is_road_distance': False
+        })
+    
+    # Select the closest EMS base
+    closest_ems_base = min(ems_base_distances, key=lambda x: x['time'])
+    EMS_BASE = closest_ems_base['coords']
+    
+    # Display selected EMS base information
+    print(f"\nSelected EMS base: {closest_ems_base['base_name']}")
+    print(f"Distance to patient: {closest_ems_base['distance']:.2f} km")
+    print(f"Estimated travel time: {closest_ems_base['time']:.2f} minutes")
+    
+    if not closest_ems_base['is_road_distance']:
+        print("(Using straight-line distance calculation)")
+    
+    # Check if using road network or straight-line distance for rest of calculations
     if ORS_API_KEY == "your_api_key_here":
         print("\nWarning: OpenRouteService API key not configured.")
         print("Using straight-line distance calculations instead of road network.")
         use_road_network = False
-
+    
     # Calculate hospital distances and times
     hospital_info = []
     print("\nCalculating route information...")
 
+    # Rest of your code remains the same
     for idx, hospital in hospitals.iterrows():
         hospital_coords = hospital['location']
         hospital_id = hospital['ID']
@@ -168,23 +222,11 @@ def main():
     distance_to_hospital_km = closest_hospital[1]
 
     # Calculate response time using road network if available
-    if use_road_network:
-        # EMS base to patient
-        road_dist_to_patient, road_time_to_patient = get_route_info(EMS_BASE, patient_location, ORS_API_KEY)
-        if road_dist_to_patient is None:
-            # Fallback to haversine
-            distance_to_patient = haversine_distance(EMS_BASE, patient_location)
-            time_to_patient = (distance_to_patient / AVERAGE_SPEED) * 60
-        else:
-            time_to_patient = road_time_to_patient
-        
-        # Patient to hospital
-        time_to_hospital = closest_hospital[2]
-    else:
-        # Using straight-line distance
-        distance_to_patient = haversine_distance(EMS_BASE, patient_location)
-        time_to_patient = (distance_to_patient / AVERAGE_SPEED) * 60
-        time_to_hospital = closest_hospital[2]
+    # EMS base to patient time is already calculated above
+    time_to_patient = closest_ems_base['time']
+    
+    # Patient to hospital
+    time_to_hospital = closest_hospital[2]
 
     # Add dispatch time and on-scene time
     dispatch_time = 2 
@@ -264,10 +306,11 @@ def main():
             # Write the route data to a temporary file for the visualization script
             route_data = {
                 'ems_base': [float(coord) for coord in EMS_BASE],
+                'ems_base_name': closest_ems_base['base_name'],
                 'patient_location': [float(coord) for coord in patient_location],
                 'hospital_coords': [float(coord) for coord in hospital_coords],
                 'hospital_name': hospital_name,
-                'hospital_level': str(hospital_level),  # Convert to string to ensure serialization
+                'hospital_level': str(hospital_level),
                 'time_to_patient': float(time_to_patient),
                 'time_to_hospital': float(time_to_hospital),
                 'dispatch_time': float(dispatch_time),

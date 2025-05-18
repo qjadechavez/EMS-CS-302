@@ -1,26 +1,55 @@
 import pandas as pd
 from datetime import datetime
 
-# Define EMS units with updated Marikina Rescue 161 base location
-EMS_UNITS = [
-    {'ems_id': 1, 'type': 'Ambulance', 'base_latitude': 14.6628689, 'base_longitude': 121.1214235},
-    {'ems_id': 2, 'type': 'Ambulance', 'base_latitude': 14.6628689, 'base_longitude': 121.1214235},
-    {'ems_id': 3, 'type': 'Ambulance', 'base_latitude': 14.6628689, 'base_longitude': 121.1214235},
-    {'ems_id': 4, 'type': 'Ambulance', 'base_latitude': 14.6628689, 'base_longitude': 121.1214235},
-    {'ems_id': 5, 'type': 'Ambulance', 'base_latitude': 14.6628689, 'base_longitude': 121.1214235},
-    {'ems_id': 6, 'type': 'Ambulance', 'base_latitude': 14.6628689, 'base_longitude': 121.1214235},
-    {'ems_id': 7, 'type': 'Rescue', 'base_latitude': 14.6628689, 'base_longitude': 121.1214235},
-    {'ems_id': 8, 'type': 'Rescue', 'base_latitude': 14.6628689, 'base_longitude': 121.1214235}
+# Define multiple EMS bases with their locations and names
+EMS_BASES = [
+    {'base_id': 163, 'base_name': '163 Base - Barangay Hall IVC', 'latitude': 14.6270218, 'longitude': 121.0797032},
+    {'base_id': 166, 'base_name': '166 Base - CHO Office, Barangay Sto.niño', 'latitude': 14.6399746, 'longitude': 121.0965973},
+    {'base_id': 167, 'base_name': '167 Base - Barangay Hall Kalumpang', 'latitude': 14.624179, 'longitude': 121.0933239},
+    {'base_id': 164, 'base_name': '164 Base - DRRMO Building, Barangay Fortune', 'latitude': 14.6628689, 'longitude': 121.1214235},
+    {'base_id': 165, 'base_name': '165 Base - St. Benedict Barangay Nangka', 'latitude': 14.6737274, 'longitude': 121.108795},
+    {'base_id': 169, 'base_name': '169 Base - Pugad Lawin, Barangay Fortune', 'latitude': 14.6584306, 'longitude': 121.1312048}
 ]
+
 START_TIME = '2025-05-13 08:00:00'
 
-# Generate EMS data
-ems = [{'ems_id': unit['ems_id'], 'type': unit['type'], 'base_latitude': unit['base_latitude'], 
-        'base_longitude': unit['base_longitude'], 'status': 'Available', 'last_available_time': START_TIME} 
-       for unit in EMS_UNITS]
+# Generate EMS data with distributed ambulances across bases
+ems = []
+ems_id = 1
+
+# Distribute ambulances: 2 per base for the first 3 bases, 1 for others
+for base in EMS_BASES:
+    # Add 2 ambulances to bases 163, 166, 167
+    num_ambulances = 2 if base['base_id'] in [163, 166, 167] else 1
+    
+    for i in range(num_ambulances):
+        ems.append({
+            'ems_id': ems_id,
+            'type': 'Ambulance',
+            'base_id': base['base_id'],
+            'base_name': base['base_name'],
+            'base_latitude': base['latitude'],
+            'base_longitude': base['longitude'],
+            'status': 'Available',
+            'last_available_time': START_TIME
+        })
+        ems_id += 1
+    
+    # Add 1 rescue vehicle to each base
+    ems.append({
+        'ems_id': ems_id,
+        'type': 'Rescue',
+        'base_id': base['base_id'],
+        'base_name': base['base_name'],
+        'base_latitude': base['latitude'],
+        'base_longitude': base['longitude'],
+        'status': 'Available',
+        'last_available_time': START_TIME
+    })
+    ems_id += 1
 
 # Save to CSV
 ems_df = pd.DataFrame(ems)
 ems_df.to_csv('./datasets/ems/marikina_ems.csv', index=False)
-print("EMS Dataset (Marikina Rescue 161):")
+print("EMS Dataset (Marikina Multiple Bases):")
 print(ems_df.to_string(index=False))
