@@ -1,0 +1,16 @@
+ems_id,type,base_id,base_name,base_latitude,base_longitude,base_location,status,last_available_time
+1,Ambulance,163,163 Base - Barangay Hall IVC,14.6270218,121.0797032,"[14.6270218, 121.0797032]",Available,2025-06-21 20:57:10.187459
+2,Ambulance,163,163 Base - Barangay Hall IVC,14.6270218,121.0797032,"[14.6270218, 121.0797032]",Available,2025-06-21 20:59:01.217368
+3,Rescue,163,163 Base - Barangay Hall IVC,14.6270218,121.0797032,"[14.6270218, 121.0797032]",Available,2025-05-13 08:00:00.000000
+4,Ambulance,166,"166 Base - CHO Office, Barangay Sto.niño",14.6399746,121.0965973,"[14.6399746, 121.0965973]",Available,2025-06-21 21:41:41.315756
+5,Ambulance,166,"166 Base - CHO Office, Barangay Sto.niño",14.6399746,121.0965973,"[14.6399746, 121.0965973]",Available,2025-06-21 19:08:20.063916
+6,Rescue,166,"166 Base - CHO Office, Barangay Sto.niño",14.6399746,121.0965973,"[14.6399746, 121.0965973]",Available,2025-05-13 08:00:00.000000
+7,Ambulance,167,167 Base - Barangay Hall Kalumpang,14.624179,121.0933239,"[14.624179, 121.0933239]",Available,2025-06-21 22:12:08.856693
+8,Ambulance,167,167 Base - Barangay Hall Kalumpang,14.624179,121.0933239,"[14.624179, 121.0933239]",Available,2025-06-21 21:38:13.339555
+9,Rescue,167,167 Base - Barangay Hall Kalumpang,14.624179,121.0933239,"[14.624179, 121.0933239]",Available,2025-05-13 08:00:00.000000
+10,Ambulance,164,"164 Base - DRRMO Building, Barangay Fortune",14.6628689,121.1214235,"[14.6628689, 121.1214235]",Available,2025-06-21 22:22:20.383269
+11,Rescue,164,"164 Base - DRRMO Building, Barangay Fortune",14.6628689,121.1214235,"[14.6628689, 121.1214235]",Available,2025-05-13 08:00:00.000000
+12,Ambulance,165,165 Base - St. Benedict Barangay Nangka,14.6737274,121.108795,"[14.6737274, 121.108795]",Available,2025-06-21 22:17:58.194230
+13,Rescue,165,165 Base - St. Benedict Barangay Nangka,14.6737274,121.108795,"[14.6737274, 121.108795]",Available,2025-05-13 08:00:00.000000
+14,Ambulance,169,"169 Base - Pugad Lawin, Barangay Fortune",14.6584306,121.1312048,"[14.6584306, 121.1312048]",Available,2025-06-21 20:48:52.403390
+15,Rescue,169,"169 Base - Pugad Lawin, Barangay Fortune",14.6584306,121.1312048,"[14.6584306, 121.1312048]",Available,2025-05-13 08:00:00.000000
