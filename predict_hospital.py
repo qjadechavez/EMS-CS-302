@@ -67,7 +67,7 @@ hospitals['location'] = hospitals[['Latitude', 'Longtitude']].values.tolist()
 
 # EMS base location (Marikina Rescue 161)
 EMS_BASE = [14.6628689, 121.1214235]
-AVERAGE_SPEED = 30  # km/h
+AVERAGE_SPEED = 30
 
 ORS_API_KEY = "5b3ce3597851110001cf6248e9e7bf352181406b956089df63e2bb75" 
 
