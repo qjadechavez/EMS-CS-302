@@ -4,7 +4,6 @@ import numpy as np
 from math import radians, sin, cos, sqrt, atan2
 import requests
 import time
-import os
 import subprocess
 
 # Haversine distance function (keep for fallback)
