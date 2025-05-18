@@ -36,7 +36,7 @@ The system provides detailed time breakdowns reflecting real-world EMS operation
 ### 4. Interactive Visualization
 
 - Generates dynamic HTML maps showing the complete emergency route
-- Displays EMS base, patient location, and selected hospital
+- Displays EMS bases, patient location, and selected hospital
 - Shows actual road network paths with time estimates
 - Includes tooltips with detailed timing information
 
