@@ -4,8 +4,6 @@ import numpy as np
 from math import radians, sin, cos, sqrt, atan2
 import requests
 import time
-import webbrowser
-import os
 import subprocess
 
 # Haversine distance function (keep for fallback)
@@ -66,6 +64,7 @@ with open('./models/le_condition.pkl', 'rb') as f:
 # Load hospital dataset for distance calculations
 hospitals = pd.read_csv('./datasets/hospital/hospital_dataset (cleaned).csv')
 hospitals['location'] = hospitals[['Latitude', 'Longtitude']].values.tolist()
+
 
 # Define multiple EMS bases with their locations and names
 EMS_BASES = [
