@@ -130,5 +130,3 @@ Do you want to visualize the route? (y/n): y
 
 Opening visualization in web browser...
 ```
-
-teting
