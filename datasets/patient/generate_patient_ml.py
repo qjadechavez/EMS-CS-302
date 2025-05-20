@@ -4,7 +4,8 @@ from datetime import datetime, timedelta
 from math import radians, sin, cos, sqrt, atan2
 
 def haversine_distance(coord1, coord2):
-    """Calculate the great-circle distance between two points on Earth in km."""
+    """Calculate the great-circle distance between two points on Earth in km,
+    with a correction factor to approximate road distances."""
     R = 6371  # Earth's radius in kilometers
     lat1, lon1 = map(radians, coord1)
     lat2, lon2 = map(radians, coord2)
@@ -12,7 +13,19 @@ def haversine_distance(coord1, coord2):
     dlon = lon2 - lon1
     a = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlon / 2) ** 2
     c = 2 * atan2(sqrt(a), sqrt(1 - a))
-    return R * c
+    direct_distance = R * c
+    
+    # Apply correction factor based on distance to approximate road distance
+    if direct_distance < 1:
+        road_factor = 1.4  # Very short distances have more deviation
+    elif direct_distance < 3:
+        road_factor = 1.35
+    elif direct_distance < 5:
+        road_factor = 1.3
+    else:
+        road_factor = 1.25  # Longer distances tend to have more direct routes
+    
+    return direct_distance * road_factor
 
 # Load hospital dataset
 hospitals = pd.read_csv('./datasets/hospital/hospital_dataset (cleaned).csv')
@@ -122,7 +135,9 @@ for i in range(NUM_PATIENTS):
     # Select hospital
     min_level = {'low': 1, 'medium': 3, 'high': 3}[severity]
     available_hospitals = [h for h in hospitals if h['level'] >= min_level]
+    
     if available_hospitals:
+        # Use haversine method (with correction factors)
         if severity == 'low':
             # Prefer Level 1 hospitals for low severity (70% chance)
             level_1_hospitals = [h for h in available_hospitals if h['level'] == 1]
@@ -132,6 +147,7 @@ for i in range(NUM_PATIENTS):
                 distances = [(h, haversine_distance(patient_location, h['location'])) for h in available_hospitals]
         else:
             distances = [(h, haversine_distance(patient_location, h['location'])) for h in available_hospitals]
+        
         hospital, distance_to_hospital = min(distances, key=lambda x: x[1])
         hospital_id = hospital['id']
         time_to_hospital = (distance_to_hospital / AVERAGE_SPEED) * 60
@@ -146,6 +162,11 @@ for i in range(NUM_PATIENTS):
     handover_time = 5   # minutes
     response_time = dispatch_time + time_to_patient + on_scene_time + time_to_hospital + handover_time
     
+    # Calculate total distance traveled
+    total_distance_km = distance_to_patient
+    if distance_to_hospital is not None:
+        total_distance_km += distance_to_hospital
+    
     # Update EMS status
     ems_unit['status'] = 'Available'
     ems_unit['last_available_time'] = call_time + timedelta(minutes=response_time)
@@ -159,27 +180,32 @@ for i in range(NUM_PATIENTS):
         'condition': condition,
         'Call_Time': call_time.strftime('%Y-%m-%d %H:%M:%S'),
         'hospital_id': hospital_id,
+        'distance_to_patient_km': distance_to_patient,
         'distance_to_hospital_km': distance_to_hospital,
+        'total_distance_km': total_distance_km,  # Fixed potential error with None values
         'response_time_min': response_time,
         'ems_base_id': ems_unit['base_id'],
-        'ems_base_name': ems_unit['base_name']
+        'ems_base_name': ems_unit['base_name'],
+        'distance_method': 'haversine'  # Normalized name
     })
     
     current_time = call_time
 
 # Create DataFrame and save
 patients_df = pd.DataFrame(patients)
-patients_df = patients_df[['patient_id', 'latitude', 'longitude', 'severity', 'condition', 'Call_Time', 
-                          'hospital_id', 'distance_to_hospital_km', 'response_time_min', 
-                          'ems_base_id', 'ems_base_name']]
-patients_df.to_csv('./datasets/patient/marikina_patients_ml.csv', index=False)
+patients_df = patients_df[['patient_id', 'latitude', 'longitude', 'severity', 'condition', 
+                           'Call_Time', 'hospital_id', 'distance_to_hospital_km', 
+                           'total_distance_km', 'response_time_min', 'ems_base_id', 'ems_base_name']]
+patients_df.to_csv('./datasets/patient/marikina_patients_ml_full.csv', index=False)
 print("Patient Dataset for ML (first 10 rows):")
 print(patients_df.head(10).to_string(index=False))
 
-# Also save a version without the EMS base info for backward compatibility
+# Also save a version without the EMS base info to a different file
 patients_df_simple = patients_df.drop(['ems_base_id', 'ems_base_name'], axis=1)
-patients_df_simple.to_csv('./datasets/patient/marikina_patients_ml_simple.csv', index=False)
+patients_df_simple.to_csv('./datasets/patient/marikina_patients_ml.csv', index=False)
 
 # Save the EMS data for reference
 ems_df = pd.DataFrame(ems)
 ems_df.to_csv('./datasets/ems/marikina_ems_generated.csv', index=False)
+
+print("Dataset generation complete!")
