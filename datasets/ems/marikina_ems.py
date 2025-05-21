@@ -11,6 +11,16 @@ EMS_BASES = [
     {'base_id': 169, 'base_name': '169 Base - Pugad Lawin, Barangay Fortune', 'latitude': 14.6584306, 'longitude': 121.1312048}
 ]
 
+# Define multiple EMS bases with their locations and names
+EMS_BASES = [
+    {'base_id': 163, 'base_name': '163 Base - Barangay Hall IVC'},
+    {'base_id': 166, 'base_name': '166 Base - CHO Office, Barangay Sto.niño'},
+    {'base_id': 167, 'base_name': '167 Base - Barangay Hall Kalumpang'},
+    {'base_id': 164, 'base_name': '164 Base - DRRMO Building, Barangay Fortune'},
+    {'base_id': 165, 'base_name': '165 Base - St. Benedict Barangay Nangka'},
+    {'base_id': 169, 'base_name': '169 Base - Pugad Lawin, Barangay Fortune'}
+]
+
 START_TIME = '2025-05-13 08:00:00'
 
 # Generate EMS data with distributed ambulances across bases

@@ -2,12 +2,14 @@ import pandas as pd
 from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.preprocessing import LabelEncoder
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score, classification_report
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix, ConfusionMatrixDisplay
+import matplotlib.pyplot as plt
 import pickle
 import os
 
 # Create models directory if it doesn't exist
 os.makedirs('./models', exist_ok=True)
+os.makedirs('./models/analysis', exist_ok=True)
 
 # Load dataset          
 df = pd.read_csv('./datasets/patient/marikina_patients_ml.csv')
@@ -55,6 +57,16 @@ with open('./models/le_severity.pkl', 'wb') as f:
     pickle.dump(le_severity, f)
 with open('./models/le_condition.pkl', 'wb') as f:
     pickle.dump(le_condition, f)
+
+# Confusion Matrix
+cm = confusion_matrix(y_test, y_pred)
+plt.figure(figsize=(10, 8))
+disp = ConfusionMatrixDisplay(confusion_matrix=cm)
+disp.plot(xticks_rotation=45)
+plt.title('Hospital Prediction Confusion Matrix')
+plt.tight_layout()
+plt.savefig('./models/analysis/confusion_matrix.png')
+plt.close()
 
 print("Model training complete. Saved as hospital_prediction_model.pkl")
 
