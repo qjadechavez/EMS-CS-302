@@ -23,13 +23,10 @@ EMS_BASES = [
 
 START_TIME = '2025-05-13 08:00:00'
 
-# Generate EMS data with distributed ambulances across bases
 ems = []
 ems_id = 1
 
-# Distribute ambulances: 2 per base for the first 3 bases, 1 for others
 for base in EMS_BASES:
-    # Add 2 ambulances to bases 163, 166, 167
     num_ambulances = 2 if base['base_id'] in [163, 166, 167] else 1
     
     for i in range(num_ambulances):
@@ -45,7 +42,6 @@ for base in EMS_BASES:
         })
         ems_id += 1
     
-    # Add 1 rescue vehicle to each base
     ems.append({
         'ems_id': ems_id,
         'type': 'Rescue',
