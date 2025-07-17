@@ -42,7 +42,6 @@ area["name"="Marikina"]["boundary"="administrative"]["admin_level"="6"]->.search
 out center;
 """
 
-# Send request with retries and deduplication
 hospitals = []
 seen_names = set()
 seen_coords = set()
@@ -57,10 +56,8 @@ for attempt in range(MAX_RETRIES):
             lon = element.get('lon') or element.get('center', {}).get('lon')
             if lat and lon:
                 lat, lon = float(lat), float(lon)
-                # Validate coordinates within Marikina
                 if (MARİKİNA_BBOX['lat_min'] <= lat <= MARİKİNA_BBOX['lat_max'] and
                     MARİKİNA_BBOX['lon_min'] <= lon <= MARİKİNA_BBOX['lon_max']):
-                    # Deduplicate by name (case-insensitive) and proximity (<100m)
                     name_lower = name.lower()
                     coord_key = f"{lat:.6f},{lon:.6f}"
                     if name_lower in seen_names or coord_key in seen_coords:
